@@ -1,0 +1,56 @@
+[
+  {
+    "child": {
+      "id": 109884919,
+      "name": "Post install tests for web -> web restore start_post_install_tests",
+      "status": "error",
+      "path": "/runbot/build/109884919",
+      "links": []
+    },
+    "status": "error",
+    "logs": [
+      {
+        "date": "2026-05-06 16:21:13",
+        "level": "ERROR",
+        "message": "[HOOT] Test \"@web/views/kanban/kanban_column_progressbar/Correct values for progress bar with toggling filter and slow RPC\" failed: Failed assertions: 3. [toEqual] expected values to be deeply equal > Expected: [ \"50%\", \"50%\", ] > Received: [ \"95%\", \"95%\", ]",
+        "isError": true
+      },
+      {
+        "date": "2026-05-06 16:24:24",
+        "level": "ERROR",
+        "message": "FAIL: WebSuite.test_unit_desktop Traceback (most recent call last): File \" /data/build/odoo/addons/web/tests/test_js.py \", line 184, in test_unit_desktop self.browser_js(f'/web/tests?&headless&loglevel=2&preset=desktop&timeout=15000{filters}', \"\", \"\", login='admin', timeout=timeout, success_signal=\"[HOOT] Test suite succeeded\", error_checker=unit_test_error_checker) File \" /data/build/odoo/odoo/tests/common.py \", line 2860, in browser_js self.fail(str(error)) AssertionError: Some tests failed: see above for details Failed tests link: http://127.0.0.1:8069/web/tests?preset=desktop&id=275d327b&debugTest=true&debug=assets",
+        "isError": true
+      },
+      {
+        "date": "2026-05-06 16:31:47",
+        "level": "ERROR",
+        "message": "FAIL: MobileWebSuite.test_unit_mobile Traceback (most recent call last): File \" /data/build/odoo/addons/web/tests/test_js.py \", line 200, in test_unit_mobile self.browser_js(f'/web/tests?&headless&loglevel=2&preset=mobile&tag=-headless&timeout=15000{filters}', \"\", \"\", login='admin', timeout=timeout, success_signal=\"[HOOT] Test suite succeeded\", error_checker=unit_test_error_checker) File \" /data/build/odoo/odoo/tests/common.py \", line 2860, in browser_js self.fail(str(error)) AssertionError: Some tests failed: see above for details Failed tests link: http://127.0.0.1:8069/web/tests?preset=mobile&id=275d327b&debugTest=true&debug=assets",
+        "isError": true
+      },
+      {
+        "date": "2026-05-06 16:32:03",
+        "level": "ERROR",
+        "message": "2 failed, 0 error(s) of 69 tests when loading database '109884919-master-all'",
+        "isError": true
+      }
+    ]
+  },
+  {
+    "child": {
+      "id": 110630167,
+      "name": "Post install tests for mail -> !partner_autocomplete restore start_post_install_tests",
+      "status": "error",
+      "path": "/runbot/build/110630167",
+      "links": []
+    },
+    "status": "error",
+    "logs": [
+      {
+        "date": "2026-05-13 12:40:15",
+        "level": "ERROR",
+        "message": "FAIL: TestMailingUi.test_snippets_mailing_menu_toolbar_tour__0 Traceback (most recent call last): File \" /data/build/odoo/addons/mass_mailing/tests/test_mailing_ui.py \", line 95, in test_snippets_mailing_menu_toolbar_tour__0 self.start_tour('/odoo', 'mass_mailing_snippets_menu_toolbar', login='admin') AssertionError: The tour mass_mailing_snippets_menu_toolbar failed at step click on snippets menu",
+        "isError": true
+      }
+    ]
+  }
+]

@@ -1,0 +1,35 @@
+{
+  "name": "runbot-next",
+  "version": "0.1.1",
+  "type": "module",
+  "private": false,
+  "bin": {
+    "runbot-next": "./dist-server/runbot-next.js"
+  },
+  "files": [
+    "dist",
+    "dist-server",
+    "README.md",
+    "docs/assets/runbot-next-app.png"
+  ],
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "build:server": "bun build src/server-node.ts --target=node --outfile=dist-server/runbot-next.js",
+    "prepack": "bun run build && bun run build:server",
+    "serve": "bun run src/server.ts",
+    "runbot": "bun run src/cli.ts",
+    "typecheck": "tsc --noEmit",
+    "smoke": "bun run src/cli.ts batch 2526059 --json"
+  },
+  "dependencies": {
+    "solid-js": "^1.9.12",
+    "vite": "^8.0.12",
+    "vite-plugin-solid": "^2.11.12",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.3.1",
+    "typescript": "^5.9.3"
+  }
+}
