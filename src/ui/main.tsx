@@ -93,13 +93,22 @@ type TrafficEntry = {
 };
 type TrafficSnapshot = { recording: boolean; entries: TrafficEntry[] };
 
+async function readJsonResponse(response: Response, fallback: string): Promise<any> {
+  const text = await response.text();
+  try {
+    return text ? JSON.parse(text) : {};
+  } catch {
+    throw new Error(`${fallback}: expected JSON, got ${response.status} ${response.statusText}`);
+  }
+}
+
 async function orpc<T>(name: string, input: unknown): Promise<T> {
   const response = await fetch(`/orpc/${name}`, {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify(input),
   });
-  const payload = await response.json();
+  const payload = await readJsonResponse(response, `oRPC call failed: ${name}`);
   if (!response.ok || payload.error) throw new Error(payload.error ?? `oRPC call failed: ${name}`);
   return payload.data;
 }
@@ -107,7 +116,7 @@ async function orpc<T>(name: string, input: unknown): Promise<T> {
 async function trafficRequest(path = "", method = "GET"): Promise<TrafficSnapshot> {
   const response = await fetch(`/traffic${path}`, { method });
   if (!response.ok) throw new Error(`Traffic request failed: ${response.status}`);
-  return response.json();
+  return readJsonResponse(response, "Traffic request failed");
 }
 
 function lineKey(childId: number, line: LogLine): string {

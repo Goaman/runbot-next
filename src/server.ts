@@ -5,6 +5,7 @@ import { createToolContext } from "./runbot/tools";
 import { TrafficRecorder } from "./runbot/traffic";
 
 const port = Number(process.env.PORT ?? 3000);
+const host = process.env.HOST ?? "127.0.0.1";
 const procedures = toOrpcProcedures();
 const traffic = new TrafficRecorder();
 const context = createToolContext({ fetcher: traffic.wrapFetch() });
@@ -39,6 +40,7 @@ async function staticResponse(pathname: string): Promise<Response> {
 
 Bun.serve({
   port,
+  hostname: host,
   async fetch(request) {
     if (request.method === "OPTIONS") return json({});
 
@@ -81,4 +83,4 @@ Bun.serve({
   },
 });
 
-console.log(`Runbot oRPC server listening on http://127.0.0.1:${port}`);
+console.log(`Runbot oRPC server listening on http://${host}:${port}`);

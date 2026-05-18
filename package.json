@@ -13,7 +13,7 @@
     "docs/assets/runbot-next-app.png"
   ],
   "scripts": {
-    "dev": "vite --host 127.0.0.1",
+    "dev": "bun run src/dev.ts",
     "build": "vite build",
     "build:server": "bun build src/server-node.ts --target=node --outfile=dist-server/runbot-next.js",
     "prepack": "bun run build && bun run build:server",

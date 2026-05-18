@@ -39,8 +39,9 @@ PORT=5173 npx runbot-next
 ```sh
 bun install
 bun run dev
-PORT=3001 bun run serve
 ```
+
+The development command starts Vite on `http://127.0.0.1:5173` and automatically starts the local API on the first available port from `3000`. Use `VITE_PORT`, `PORT`, or `ORPC_PORT` to override those ports.
 
 For production-package checks:
 
