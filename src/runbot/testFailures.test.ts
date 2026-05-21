@@ -262,6 +262,43 @@ Failed assertions:
     expect(tests[2]!.command).toBe("./odoo-bin -d test --test-enable --stop-after-init --test-tags odoo.addons.mass_mailing.tests.test_mailing_ui.test_snippets_mailing_menu_toolbar_tour__0");
   });
 
+  test("deduplicates a Hoot failure that reappears in a retry pass", () => {
+    const message = `[HOOT] Test "@web/core/template/source-file: component with primary inherit reports correct file per access" failed:
+
+Failed assertions:
+
+2. [toBe] expected values to be strictly equal
+> Expected: undefined
+> Received: undefined
+
+3. [errors] 1 unverified error(s)
+
+Error during test:
+
+Cannot read properties of undefined (reading 'filename')`;
+    const tests = parseRunbotTestFailures([
+      {
+        child: {
+          id: 42,
+          name: "web",
+          status: "error",
+          path: "/runbot/build/42",
+          links: [],
+        },
+        status: "error",
+        logs: [
+          { date: "2026-03-11 17:46:37", level: "ERROR", isError: true, message },
+          { date: "2026-03-11 17:58:05", level: "ERROR", isError: true, message },
+        ],
+      },
+    ]);
+
+    expect(tests).toHaveLength(1);
+    expect(tests[0]!.lines).toHaveLength(1);
+    expect(tests[0]!.sourceLines).toHaveLength(1);
+    expect(tests[0]!.lines[0]!.message).toContain("Cannot read properties of undefined (reading 'filename')");
+  });
+
   test("reports unparsed error chunks separately", () => {
     const entries: RunbotTestLogEntry[] = [
       {

@@ -219,9 +219,16 @@ function attachCrash(failure: RunbotParsedTestFailure, crash: RunbotBrowserCrash
   failure.crashes.push(crash);
 }
 
+function appendUniqueLines(target: RunbotVisibleLogLine[], lines: Iterable<RunbotVisibleLogLine>): void {
+  for (const line of lines) {
+    if (target.some((existing) => existing.message === line.message)) continue;
+    target.push(line);
+  }
+}
+
 function mergeFailureDetails(target: RunbotParsedTestFailure, source: RunbotParsedTestFailure): void {
-  target.lines.push(...source.lines);
-  target.sourceLines.push(...source.sourceLines);
+  appendUniqueLines(target.lines, source.lines);
+  appendUniqueLines(target.sourceLines, source.sourceLines);
   for (const crash of source.crashes ?? []) attachCrash(target, crash);
   for (const tag of source.tags) {
     if (!target.tags.includes(tag)) target.tags.push(tag);
@@ -284,8 +291,8 @@ export function parseRunbotTestFailures(entries: RunbotTestLogEntry[], options: 
         if (parsed.kind === "tour" && parsed.tourName && !parsed.pythonTest) {
           const tourFailure = findTourFailure(merged.values(), entry.child, parsed.tourName);
           if (tourFailure) {
-            tourFailure.lines.push(...parsed.lines);
-            tourFailure.sourceLines.push(...parsed.sourceLines);
+            appendUniqueLines(tourFailure.lines, parsed.lines);
+            appendUniqueLines(tourFailure.sourceLines, parsed.sourceLines);
             flushPendingCrashes(tourFailure);
             lastTour = tourFailure;
             continue;
@@ -295,8 +302,8 @@ export function parseRunbotTestFailures(entries: RunbotTestLogEntry[], options: 
         const key = failureKey(parsed);
         const existing = merged.get(key);
         if (existing) {
-          existing.lines.push(...parsed.lines);
-          existing.sourceLines.push(...parsed.sourceLines);
+          appendUniqueLines(existing.lines, parsed.lines);
+          appendUniqueLines(existing.sourceLines, parsed.sourceLines);
           if (existing.kind === "tour") {
             lastTour = existing;
           }
