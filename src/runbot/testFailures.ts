@@ -147,11 +147,10 @@ function parseHoot(line: RunbotVisibleLogLine, child: RunbotChildBuild, sourceLi
 function parseFailLine(line: RunbotVisibleLogLine, child: RunbotChildBuild, sourceLine = line): ParsedDraft | undefined {
   const match = line.message.match(/^FAIL:\s+([^\s]+)\s+Traceback[\s\S]*?File\s+"\s*([^"]+?)\s*",\s+line\s+\d+,\s+in\s+(\w+)([\s\S]*)$/);
   if (!match) return undefined;
-  const pythonTest = match[1];
+  const failTarget = match[1];
   const pythonFile = match[2];
-  const method = match[3];
   const tail = match[4] ?? "";
-  if (!pythonTest || !pythonFile || !method) return undefined;
+  if (!failTarget || !pythonFile) return undefined;
   const lower = line.message.toLowerCase();
   const preset = lower.includes("preset=mobile") ? "mobile" : lower.includes("preset=desktop") ? "desktop" : undefined;
   const hasTourRunner = lower.includes("start_tour") || lower.includes("start_pos_tour");
@@ -169,11 +168,12 @@ function parseFailLine(line: RunbotVisibleLogLine, child: RunbotChildBuild, sour
   const module = pythonModuleFromFile(pythonFile);
   const tourName = kind === "tour" ? extractTourName(line.message) : undefined;
   if (tourName) tags.push(tourName);
+  const pythonTest = module ? `${module}.${failTarget}` : failTarget;
   return {
     kind,
-    title: tourName && runner === "start_tour" ? tourName : pythonTest,
+    title: failTarget,
     ...(runner ? { runner } : {}),
-    pythonTest: module ? `${module}.${method}` : pythonTest,
+    pythonTest,
     pythonFile: compact(pythonFile),
     ...(tourName ? { tourName } : {}),
     ...(preset ? { preset } : {}),

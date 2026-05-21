@@ -8,13 +8,13 @@ describe("parseRunbotTestFailures", () => {
 
     expect(tests.map((item) => item.kind)).toEqual(["hoot", "hoot", "tour"]);
     expect(tests[0]!.jsTest).toContain("@web/views/kanban");
-    expect(tests[0]!.pythonTest).toBe("odoo.addons.web.tests.test_js.test_unit_desktop");
+    expect(tests[0]!.pythonTest).toBe("odoo.addons.web.tests.test_js.WebSuite.test_unit_desktop");
     expect(tests[0]!.preset).toBe("desktop");
     expect(tests[1]!.preset).toBe("mobile");
-    expect(tests[2]!.pythonTest).toBe("odoo.addons.mass_mailing.tests.test_mailing_ui.test_snippets_mailing_menu_toolbar_tour__0");
+    expect(tests[2]!.pythonTest).toBe("odoo.addons.mass_mailing.tests.test_mailing_ui.TestMailingUi.test_snippets_mailing_menu_toolbar_tour__0");
     expect(tests[2]!.runner).toBe("start_tour");
     expect(tests[2]!.tourName).toBe("mass_mailing_snippets_menu_toolbar");
-    expect(tests[2]!.title).toBe("mass_mailing_snippets_menu_toolbar");
+    expect(tests[2]!.title).toBe("TestMailingUi.test_snippets_mailing_menu_toolbar_tour__0");
   });
 
   test("filters summary-only errors by default", () => {
@@ -140,9 +140,9 @@ Failed assertions:
     expect(tests).toHaveLength(1);
     expect(tests[0]!.jsTest).toBe("@html_editor/toolbar/should focus the editable area after selecting a font size item");
     expect(tests[0]!.runner).toBe("browser_js");
-    expect(tests[0]!.pythonTest).toBe("odoo.addons.web.tests.test_js.test_unit_desktop");
+    expect(tests[0]!.pythonTest).toBe("odoo.addons.web.tests.test_js.WebSuite.test_unit_desktop");
     expect(tests[0]!.pythonFile).toBe("/data/build/odoo/addons/web/tests/test_js.py");
-    expect(tests[0]!.command).toContain("--test-tags odoo.addons.web.tests.test_js.test_unit_desktop");
+    expect(tests[0]!.command).toContain("--test-tags odoo.addons.web.tests.test_js.WebSuite.test_unit_desktop");
   });
 
   test("extracts the failed tour name from start_tour tracebacks", () => {
@@ -172,8 +172,8 @@ Failed assertions:
     expect(tests[0]!.kind).toBe("tour");
     expect(tests[0]!.runner).toBe("start_tour");
     expect(tests[0]!.tourName).toBe("mass_mailing_snippets_menu_toolbar");
-    expect(tests[0]!.title).toBe("mass_mailing_snippets_menu_toolbar");
-    expect(tests[0]!.pythonTest).toBe("odoo.addons.mass_mailing.tests.test_mailing_ui.test_snippets_mailing_menu_toolbar_tour__0");
+    expect(tests[0]!.title).toBe("TestMailingUi.test_snippets_mailing_menu_toolbar_tour__0");
+    expect(tests[0]!.pythonTest).toBe("odoo.addons.mass_mailing.tests.test_mailing_ui.TestMailingUi.test_snippets_mailing_menu_toolbar_tour__0");
   });
 
   test("extracts the failed tour name from start_pos_tour tracebacks", () => {
@@ -201,7 +201,7 @@ Failed assertions:
 
     expect(tests).toHaveLength(1);
     expect(tests[0]!.tourName).toBe("test_transfering_orders");
-    expect(tests[0]!.title).toBe("test_transfering_orders");
+    expect(tests[0]!.title).toBe("TestFrontend.test_transfering_orders");
   });
 
   test("attaches direct tour step failures and browser crashes to the matching Python tour", () => {
@@ -257,9 +257,9 @@ Failed assertions:
 
   test("builds copyable local commands", () => {
     const tests = parseRunbotTestFailures(samples as RunbotTestLogEntry[]);
-    expect(tests[0]!.command).toContain("--test-tags odoo.addons.web.tests.test_js.test_unit_desktop");
+    expect(tests[0]!.command).toContain("--test-tags odoo.addons.web.tests.test_js.WebSuite.test_unit_desktop");
     expect(tests[0]!.command).toContain("preset=desktop");
-    expect(tests[2]!.command).toBe("./odoo-bin -d test --test-enable --stop-after-init --test-tags odoo.addons.mass_mailing.tests.test_mailing_ui.test_snippets_mailing_menu_toolbar_tour__0");
+    expect(tests[2]!.command).toBe("./odoo-bin -d test --test-enable --stop-after-init --test-tags odoo.addons.mass_mailing.tests.test_mailing_ui.TestMailingUi.test_snippets_mailing_menu_toolbar_tour__0");
   });
 
   test("deduplicates a Hoot failure that reappears in a retry pass", () => {
@@ -404,6 +404,50 @@ Cannot read properties of undefined (reading 'filename')`;
     );
     expect(crash.message).toContain("\n");
     expect(crash.message).toContain("at TourAutomatic.throwError");
+  });
+
+  test("keeps two tests with the same method name but different classes separate", () => {
+    const traceback =
+      'Traceback (most recent call last):\n' +
+      'File " /data/build/odoo/addons/pos_online_payment_self_order/tests/test_self_order_mobile.py ", line 103, in test_online_payment_mobile_self_order_preparation_changes\n' +
+      "self.start_tour(self.pos_config._get_self_order_route(), 'test_online_payment_mobile_self_order_preparation_changes')\n" +
+      'AssertionError: tour failed';
+    const tests = parseRunbotTestFailures([
+      {
+        child: {
+          id: 42,
+          name: "pos child",
+          status: "error",
+          path: "/runbot/build/42",
+          links: [],
+        },
+        status: "error",
+        logs: [
+          {
+            date: "2026-03-11 18:00:00",
+            level: "ERROR",
+            isError: true,
+            message: `FAIL: TestSelfOrderFakePayment.test_online_payment_mobile_self_order_preparation_changes ${traceback}`,
+          },
+          {
+            date: "2026-03-11 18:00:01",
+            level: "ERROR",
+            isError: true,
+            message: `FAIL: TestSelfOrderMobile.test_online_payment_mobile_self_order_preparation_changes ${traceback}`,
+          },
+        ],
+      },
+    ]);
+
+    expect(tests).toHaveLength(2);
+    expect(tests.map((t) => t.pythonTest)).toEqual([
+      "odoo.addons.pos_online_payment_self_order.tests.test_self_order_mobile.TestSelfOrderFakePayment.test_online_payment_mobile_self_order_preparation_changes",
+      "odoo.addons.pos_online_payment_self_order.tests.test_self_order_mobile.TestSelfOrderMobile.test_online_payment_mobile_self_order_preparation_changes",
+    ]);
+    expect(tests.map((t) => t.title)).toEqual([
+      "TestSelfOrderFakePayment.test_online_payment_mobile_self_order_preparation_changes",
+      "TestSelfOrderMobile.test_online_payment_mobile_self_order_preparation_changes",
+    ]);
   });
 
   test("reports unparsed error chunks separately", () => {
