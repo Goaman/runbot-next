@@ -108,11 +108,9 @@ function extractTourName(message: string): string | undefined {
 }
 
 function parseTourStepFailure(line: RunbotVisibleLogLine, child: RunbotChildBuild, sourceLine = line): ParsedDraft | undefined {
-  const match = line.message.match(/^FAILED:\s+\[\d+\/\d+\]\s+Tour\s+(.+?)\s+(?:→|->)\s+Step\s+(.+?)(?:\s+\(trigger:\s*([\s\S]*?)\)\.)?([\s\S]*)$/);
+  const match = line.message.match(/^FAILED:\s+\[\d+\/\d+\]\s+Tour\s+(.+?)\s+(?:→|->)\s+Step\s+/);
   const tourName = match?.[1]?.trim();
   if (!match || !tourName) return undefined;
-  const step = compact(match[2] ?? "");
-  const details = compact(`${match[3] ? `trigger: ${match[3]}. ` : ""}${match[4] ?? ""}`);
   return {
     kind: "tour",
     title: tourName,
@@ -120,7 +118,7 @@ function parseTourStepFailure(line: RunbotVisibleLogLine, child: RunbotChildBuil
     tourName,
     tags: ["tour", "start_tour", tourName],
     child,
-    lines: [{ ...line, message: [step, details].filter(Boolean).join("\n") }],
+    lines: [line],
     sourceLines: [sourceLine],
   };
 }
@@ -145,11 +143,10 @@ function parseHoot(line: RunbotVisibleLogLine, child: RunbotChildBuild, sourceLi
 }
 
 function parseFailLine(line: RunbotVisibleLogLine, child: RunbotChildBuild, sourceLine = line): ParsedDraft | undefined {
-  const match = line.message.match(/^FAIL:\s+([^\s]+)\s+Traceback[\s\S]*?File\s+"\s*([^"]+?)\s*",\s+line\s+\d+,\s+in\s+(\w+)([\s\S]*)$/);
+  const match = line.message.match(/^FAIL:\s+([^\s]+)\s+Traceback[\s\S]*?File\s+"\s*([^"]+?)\s*",\s+line\s+\d+,\s+in\s+(\w+)/);
   if (!match) return undefined;
   const failTarget = match[1];
   const pythonFile = match[2];
-  const tail = match[4] ?? "";
   if (!failTarget || !pythonFile) return undefined;
   const lower = line.message.toLowerCase();
   const preset = lower.includes("preset=mobile") ? "mobile" : lower.includes("preset=desktop") ? "desktop" : undefined;
@@ -179,7 +176,7 @@ function parseFailLine(line: RunbotVisibleLogLine, child: RunbotChildBuild, sour
     ...(preset ? { preset } : {}),
     tags,
     child,
-    lines: [{ ...line, message: tail.trim() || line.message }],
+    lines: [line],
     sourceLines: [sourceLine],
   };
 }
