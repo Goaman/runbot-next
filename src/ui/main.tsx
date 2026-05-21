@@ -202,14 +202,15 @@ function Icon(props: { name: "search" | "refresh" | "traffic" | "open" | "copy" 
 }
 
 function batchStatus(batch: BatchSummary | undefined, details?: Batch): string | undefined {
-  if (!batch) return undefined;
-  if (batch.status) return batch.status;
-  const statuses = details?.builds.map((build) => build.status).filter(Boolean) ?? [];
+  if (batch?.status) return batch.status;
+  const builds = details?.builds ?? [];
+  const statuses = builds.map((build) => build.status).filter(Boolean);
   if (statuses.includes("error")) return "error";
   if (statuses.includes("warning")) return "warning";
   if (statuses.includes("pending")) return "pending";
   if (statuses.includes("success")) return "success";
-  if (batch.buildIds.length === 0) return "pending";
+  if (batch && batch.buildIds.length === 0) return "pending";
+  if (details && builds.length === 0) return "pending";
   return undefined;
 }
 
@@ -899,7 +900,11 @@ function App() {
                             <summary>
                               <div class="row1">
                                 <span class="chev">›</span>
-                                <StatusGlyph status={data().status} />
+                                <StatusGlyph status={batchStatus(
+                                  branchBatches()?.find((item) => item.id === batchData().id)
+                                  ?? selectedBranch()?.batches.find((item) => item.id === batchData().id),
+                                  batchData(),
+                                )} />
                                 <span class="branch-name">{batchData().bundle ?? selectedBranch()?.name}</span>
                                 <span class="batch-chip">Batch {batchData().id}</span>
                                 <span class="batch-chip">{batchData().version ?? "version ?"}</span>
