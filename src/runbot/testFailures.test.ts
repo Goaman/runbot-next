@@ -299,6 +299,39 @@ Cannot read properties of undefined (reading 'filename')`;
     expect(tests[0]!.lines[0]!.message).toContain("Cannot read properties of undefined (reading 'filename')");
   });
 
+  test("deduplicates browser crashes with the same message attached to a tour", () => {
+    const crashMessage =
+      "TypeError: Cannot read properties of undefined (reading 'describeMe')\n    at TourAutomatic.throwError (http://127.0.0.1:8069/web/assets/tours.js:599:162)";
+    const entries: RunbotTestLogEntry[] = [
+      {
+        child: {
+          id: 42,
+          name: "pos child",
+          status: "error",
+          path: "/runbot/build/42",
+          links: [],
+        },
+        status: "error",
+        logs: [
+          {
+            date: "2026-03-11 18:00:00",
+            level: "ERROR",
+            isError: true,
+            message:
+              'FAIL: TestSelfOrder.test_online_payment_mobile_self_order_preparation_changes Traceback (most recent call last): File " /data/build/odoo/addons/pos_online_payment_self_order/tests/test_self_order_mobile.py ", line 50, in test_online_payment_mobile_self_order_preparation_changes self.start_tour(self.pos_config._get_self_order_route(), \'test_online_payment_mobile_self_order_preparation_changes\') AssertionError: tour failed',
+          },
+          { date: "2026-03-11 18:02:25", level: "ERROR", isError: true, message: crashMessage },
+          { date: "2026-03-11 18:02:31", level: "ERROR", isError: true, message: crashMessage },
+          { date: "2026-03-11 18:02:35", level: "ERROR", isError: true, message: crashMessage },
+        ],
+      },
+    ];
+
+    const tests = parseRunbotTestFailures(entries);
+    expect(tests).toHaveLength(1);
+    expect(tests[0]!.crashes).toHaveLength(1);
+  });
+
   test("reports unparsed error chunks separately", () => {
     const entries: RunbotTestLogEntry[] = [
       {

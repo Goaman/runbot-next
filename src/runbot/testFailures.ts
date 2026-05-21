@@ -215,7 +215,7 @@ function parseBrowserCrash(line: RunbotVisibleLogLine, sourceLine = line): Runbo
 
 function attachCrash(failure: RunbotParsedTestFailure, crash: RunbotBrowserCrash): void {
   failure.crashes ??= [];
-  if (failure.crashes.some((item) => item.message === crash.message && item.sourceLine === crash.sourceLine)) return;
+  if (failure.crashes.some((item) => item.message === crash.message)) return;
   failure.crashes.push(crash);
 }
 
