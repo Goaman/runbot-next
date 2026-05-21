@@ -201,16 +201,33 @@ function parseLine(line: RunbotVisibleLogLine, child: RunbotChildBuild, sourceLi
 }
 
 function parseBrowserCrash(line: RunbotVisibleLogLine, sourceLine = line): RunbotBrowserCrash | undefined {
-  const message = compact(line.message);
+  const message = line.message.trim();
   if (!message) return undefined;
-  const normalized = message.replace(/^Error received after termination:\s*/i, "");
-  if (!/^(?:[A-Za-z]*Error|Uncaught[A-Za-z]*Error):/i.test(normalized)) return undefined;
+  const head = message.replace(/^Error received after termination:\s*/i, "");
+  if (!/^(?:[A-Za-z]*Error|Uncaught[A-Za-z]*Error):/i.test(head)) return undefined;
   return {
-    title: normalized.split(/\s+at\s+/)[0] ?? normalized,
-    message: normalized,
+    title: head.split(/\s+at\s+/)[0] ?? head,
+    message,
     line,
     sourceLine,
   };
+}
+
+function extractEmbeddedCrashes(line: RunbotVisibleLogLine, sourceLine: RunbotVisibleLogLine): RunbotBrowserCrash[] {
+  const crashes: RunbotBrowserCrash[] = [];
+  const regex = /AssertionError:\s+((?:Uncaught[A-Z][A-Za-z]*Error|[A-Z][A-Za-z]*Error):[\s\S]+?)(?=\n\s*(?:FAIL:|====|Some tests failed:|\d+\s+failed,)|$)/g;
+  let match: RegExpExecArray | null;
+  while ((match = regex.exec(line.message)) !== null) {
+    const body = (match[1] ?? "").trim();
+    if (!body) continue;
+    crashes.push({
+      title: body.split(/\s+at\s+/)[0] ?? body,
+      message: body,
+      line,
+      sourceLine,
+    });
+  }
+  return crashes;
 }
 
 function attachCrash(failure: RunbotParsedTestFailure, crash: RunbotBrowserCrash): void {
@@ -275,6 +292,9 @@ export function parseRunbotTestFailures(entries: RunbotTestLogEntry[], options: 
           continue;
         }
         if (parsed.kind === "summary" && !options.includeSummary) continue;
+        if (parsed.kind === "tour" && parsed.pythonTest) {
+          for (const crash of extractEmbeddedCrashes(splitLine, line)) pendingCrashes.push(crash);
+        }
         if (isHootWrapper(parsed)) {
           const matched = pendingHoots.splice(0);
           for (const failure of matched) {
@@ -298,13 +318,13 @@ export function parseRunbotTestFailures(entries: RunbotTestLogEntry[], options: 
             continue;
           }
         }
-        if (parsed.kind === "tour" && parsed.pythonTest) flushPendingCrashes();
         const key = failureKey(parsed);
         const existing = merged.get(key);
         if (existing) {
           appendUniqueLines(existing.lines, parsed.lines);
           appendUniqueLines(existing.sourceLines, parsed.sourceLines);
           if (existing.kind === "tour") {
+            flushPendingCrashes(existing);
             lastTour = existing;
           }
           if (existing.kind === "hoot" && existing.jsTest && !existing.pythonTest && !pendingHoots.includes(existing)) {
@@ -328,6 +348,7 @@ export function parseRunbotTestFailures(entries: RunbotTestLogEntry[], options: 
         merged.set(key, next);
         if (next.kind === "hoot" && next.jsTest && !next.pythonTest) pendingHoots.push(next);
         if (next.kind === "tour") {
+          flushPendingCrashes(next);
           lastTour = next;
         }
       }
@@ -340,13 +361,16 @@ export function parseRunbotTestFailures(entries: RunbotTestLogEntry[], options: 
 
 export function parseUnparsedRunbotTestFailures(entries: RunbotTestLogEntry[]): RunbotUnparsedTestFailure[] {
   const unparsed: RunbotUnparsedTestFailure[] = [];
-  const attachedCrashes = new Set(parseRunbotTestFailures(entries).flatMap((failure) => failure.crashes ?? []).map((crash) => crash.sourceLine));
+  const attachedCrashes = parseRunbotTestFailures(entries).flatMap((failure) => failure.crashes ?? []);
+  const attachedCrashLines = new Set(attachedCrashes.map((crash) => crash.sourceLine));
+  const attachedCrashMessages = new Set(attachedCrashes.map((crash) => crash.message));
   for (const entry of entries) {
     for (const line of entry.logs ?? []) {
       if (!line.isError) continue;
       for (const splitLine of splitRunbotTestErrorLine(line)) {
         if (parseLine(splitLine, entry.child, line)) continue;
-        if (parseBrowserCrash(splitLine, line) && attachedCrashes.has(line)) continue;
+        const crash = parseBrowserCrash(splitLine, line);
+        if (crash && (attachedCrashLines.has(line) || attachedCrashMessages.has(crash.message))) continue;
         unparsed.push({
           id: `${unparsed.length + 1}`,
           child: entry.child,

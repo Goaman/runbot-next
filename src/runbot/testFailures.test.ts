@@ -332,6 +332,80 @@ Cannot read properties of undefined (reading 'filename')`;
     expect(tests[0]!.crashes).toHaveLength(1);
   });
 
+  test("attaches a crash logged just before its FAIL to the right test, even with a summary in between", () => {
+    const crashMessage =
+      "Error received after termination: TypeError: Cannot read properties of undefined (reading 'describeMe')\nat TourAutomatic.throwError (http://127.0.0.1:8069/web/assets/1/c468e6f/pos_self_order.assets_tests.min.js:599:162)";
+    const failA =
+      'FAIL: TestSelfOrderFakePayment.test_online_payment_mobile_no_confirmation_page\nTraceback (most recent call last):\nFile " /data/build/odoo/addons/pos_online_payment_self_order/tests/test_self_order_fake_payment.py ", line 42, in test_online_payment_mobile_no_confirmation_page\nself.start_tour(self_route, "test_online_payment_mobile_self_order_preparation_changes")\nAssertionError: tour failed';
+    const failB =
+      'FAIL: TestSelfOrderMobile.test_online_payment_self_pay_after_meal_table\nTraceback (most recent call last):\nFile " /data/build/odoo/addons/pos_online_payment_self_order/tests/test_self_order_mobile.py ", line 67, in test_online_payment_self_pay_after_meal_table\nself.start_tour(self_route, "self_mobile_online_payment_meal")\nAssertionError: tour failed';
+    const entries: RunbotTestLogEntry[] = [
+      {
+        child: {
+          id: 103751432,
+          name: "pos child",
+          status: "error",
+          path: "/runbot/build/103751432",
+          links: [],
+        },
+        status: "error",
+        logs: [
+          { date: "2026-03-11 18:02:25", level: "ERROR", isError: true, message: crashMessage },
+          { date: "2026-03-11 18:02:26", level: "ERROR", isError: true, message: failA },
+          { date: "2026-03-11 18:03:29", level: "ERROR", isError: true, message: crashMessage },
+          { date: "2026-03-11 18:03:30", level: "ERROR", isError: true, message: "Some tests failed: see above for details" },
+          { date: "2026-03-11 18:03:31", level: "ERROR", isError: true, message: failB },
+        ],
+      },
+    ];
+
+    const tests = parseRunbotTestFailures(entries);
+    expect(tests).toHaveLength(2);
+    const a = tests.find((t) => t.pythonTest?.endsWith("test_online_payment_mobile_no_confirmation_page"));
+    const b = tests.find((t) => t.pythonTest?.endsWith("test_online_payment_self_pay_after_meal_table"));
+    expect(a?.crashes).toHaveLength(1);
+    expect(b?.crashes).toHaveLength(1);
+    expect(parseUnparsedRunbotTestFailures(entries)).toHaveLength(0);
+  });
+
+  test("promotes a JS error embedded in an AssertionError to a browser crash", () => {
+    const failMessage =
+      'FAIL: TestFrontEnd.test_front_end_ui\n' +
+      'Traceback (most recent call last):\n' +
+      '  File "/usr/lib/python3/dist-packages/freezegun/api.py", line 789, in wrapper\n' +
+      '    result = func(*args, **kwargs)\n' +
+      '  File " /data/build/enterprise/planning/tests/test_front_end.py ", line 56, in test_front_end_ui\n' +
+      "    self.start_tour(front_end_thibault_url[self.employee_thibault.id], 'planning_front_end_tour')\n" +
+      '  File " /data/build/odoo/odoo/tests/common.py ", line 2658, in start_tour\n' +
+      '    self.browser_js(...)\n' +
+      '  File " /data/build/odoo/odoo/tests/common.py ", line 2632, in browser_js\n' +
+      '    self.fail(str(error))\n' +
+      "AssertionError: UncaughtTypeError: Cannot read properties of undefined (reading 'describeMe')\n" +
+      '    at TourAutomatic.throwError (http://127.0.0.1:8069/web/assets/1/598cf7a/web.__assets_tests_call__.min.js:679:162)\n' +
+      '    at beforeUnloadHandler (http://127.0.0.1:8069/web/assets/1/598cf7a/web.__assets_tests_call__.min.js:674:45)';
+    const tests = parseRunbotTestFailures([
+      {
+        child: {
+          id: 103751431,
+          name: "planning child",
+          status: "error",
+          path: "/runbot/build/103751431",
+          links: [],
+        },
+        status: "error",
+        logs: [{ date: "2026-03-11 17:45:02", level: "ERROR", isError: true, message: failMessage }],
+      },
+    ]);
+    expect(tests).toHaveLength(1);
+    expect(tests[0]!.crashes).toHaveLength(1);
+    const crash = tests[0]!.crashes![0]!;
+    expect(crash.title).toBe(
+      "UncaughtTypeError: Cannot read properties of undefined (reading 'describeMe')",
+    );
+    expect(crash.message).toContain("\n");
+    expect(crash.message).toContain("at TourAutomatic.throwError");
+  });
+
   test("reports unparsed error chunks separately", () => {
     const entries: RunbotTestLogEntry[] = [
       {
