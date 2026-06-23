@@ -1,0 +1,26 @@
+{
+  "skill_name": "runbot-tests",
+  "evals": [
+    {
+      "id": 0,
+      "name": "last-tests-for-branch",
+      "prompt": "retrieve the last tests for the branch master-mail-call-action-list-js-tref-nby",
+      "expected_output": "Finds the latest batch for the branch, identifies the failing build slot (Enterprise Tests), and reports the failing test(s) with the reproduce command and a root-cause line. Uses the runbot-next CLI (batches --search, build-names, tests --batch --slot).",
+      "files": []
+    },
+    {
+      "id": 1,
+      "name": "why-is-build-red",
+      "prompt": "The Enterprise Tests build is red on master-mail-call-action-list-js-tref-nby. Why? Give me the command to reproduce the failing test locally.",
+      "expected_output": "Locates the branch's latest batch and Enterprise Tests slot, pulls the parsed failure, and surfaces the `command` field (the ./odoo-bin --test-tags reproduce command) plus a short root cause.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "passing-branch-no-failures",
+      "prompt": "Did the last batch for branch master-mail-call-action-list-js-tref-nby pass? Summarize the test results.",
+      "expected_output": "Checks batch status and slot statuses via the CLI and reports clearly whether tests passed or which slots failed, without inventing failures.",
+      "files": []
+    }
+  ]
+}

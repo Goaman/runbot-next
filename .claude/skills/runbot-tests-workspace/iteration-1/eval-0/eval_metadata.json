@@ -1,0 +1,19 @@
+{
+  "eval_id": 0,
+  "eval_name": "last-tests-for-branch",
+  "prompt": "retrieve the last tests for the branch master-mail-call-action-list-js-tref-nby",
+  "assertions": [
+    {
+      "text": "Identifies the latest batch 2549935"
+    },
+    {
+      "text": "Identifies Enterprise Tests as the failing slot"
+    },
+    {
+      "text": "Names the failing test test_custom_popup_snippet"
+    },
+    {
+      "text": "Provides a reproduce command with --test-tags"
+    }
+  ]
+}

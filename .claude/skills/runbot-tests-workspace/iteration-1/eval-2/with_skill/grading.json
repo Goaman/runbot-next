@@ -1,0 +1,22 @@
+{
+  "run_id": "eval-2-with_skill",
+  "passed": 3,
+  "total": 3,
+  "expectations": [
+    {
+      "text": "States the batch did NOT pass",
+      "passed": true,
+      "evidence": "did NOT pass"
+    },
+    {
+      "text": "Identifies Enterprise Tests as the failing slot",
+      "passed": true,
+      "evidence": "Enterprise Tests"
+    },
+    {
+      "text": "Names a failing test",
+      "passed": true,
+      "evidence": "test_custom_popup_snippet"
+    }
+  ]
+}

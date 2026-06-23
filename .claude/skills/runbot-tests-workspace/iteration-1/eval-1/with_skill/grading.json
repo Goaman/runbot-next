@@ -1,0 +1,27 @@
+{
+  "run_id": "eval-1-with_skill",
+  "passed": 4,
+  "total": 4,
+  "expectations": [
+    {
+      "text": "Identifies the latest batch 2549935",
+      "passed": true,
+      "evidence": "2549935"
+    },
+    {
+      "text": "Identifies Enterprise Tests as the failing slot",
+      "passed": true,
+      "evidence": "Enterprise Tests"
+    },
+    {
+      "text": "Names the failing test test_custom_popup_snippet",
+      "passed": true,
+      "evidence": "test_custom_popup_snippet"
+    },
+    {
+      "text": "Provides a reproduce command with --test-tags",
+      "passed": true,
+      "evidence": "--test-tags"
+    }
+  ]
+}

@@ -1,0 +1,305 @@
+{
+  "metadata": {
+    "skill_name": "runbot-tests",
+    "skill_path": "/Volumes/Goadrive/git-repos/skill-runbot/.claude/skills/runbot-tests",
+    "executor_model": "claude-opus-4-7[1m]",
+    "timestamp": "2026-05-27T19:45:00Z",
+    "evals_run": [
+      0,
+      1,
+      2
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "last-tests-for-branch",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 49.9,
+        "tokens": 31248,
+        "tool_calls": 7,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Identifies the latest batch 2549935",
+          "passed": true,
+          "evidence": "2549935"
+        },
+        {
+          "text": "Identifies Enterprise Tests as the failing slot",
+          "passed": true,
+          "evidence": "Enterprise Tests"
+        },
+        {
+          "text": "Names the failing test test_custom_popup_snippet",
+          "passed": true,
+          "evidence": "test_custom_popup_snippet"
+        },
+        {
+          "text": "Provides a reproduce command with --test-tags",
+          "passed": true,
+          "evidence": "--test-tags"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "last-tests-for-branch",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 69.0,
+        "tokens": 32521,
+        "tool_calls": 12,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Identifies the latest batch 2549935",
+          "passed": true,
+          "evidence": "2549935"
+        },
+        {
+          "text": "Identifies Enterprise Tests as the failing slot",
+          "passed": true,
+          "evidence": "Enterprise Tests"
+        },
+        {
+          "text": "Names the failing test test_custom_popup_snippet",
+          "passed": true,
+          "evidence": "test_custom_popup_snippet"
+        },
+        {
+          "text": "Provides a reproduce command with --test-tags",
+          "passed": true,
+          "evidence": "--test-tags"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "why-is-build-red",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 49.3,
+        "tokens": 28262,
+        "tool_calls": 7,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Identifies the latest batch 2549935",
+          "passed": true,
+          "evidence": "2549935"
+        },
+        {
+          "text": "Identifies Enterprise Tests as the failing slot",
+          "passed": true,
+          "evidence": "Enterprise Tests"
+        },
+        {
+          "text": "Names the failing test test_custom_popup_snippet",
+          "passed": true,
+          "evidence": "test_custom_popup_snippet"
+        },
+        {
+          "text": "Provides a reproduce command with --test-tags",
+          "passed": true,
+          "evidence": "--test-tags"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "why-is-build-red",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 72.6,
+        "tokens": 33174,
+        "tool_calls": 13,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Identifies the latest batch 2549935",
+          "passed": true,
+          "evidence": "2549935"
+        },
+        {
+          "text": "Identifies Enterprise Tests as the failing slot",
+          "passed": true,
+          "evidence": "Enterprise Tests"
+        },
+        {
+          "text": "Names the failing test test_custom_popup_snippet",
+          "passed": true,
+          "evidence": "test_custom_popup_snippet"
+        },
+        {
+          "text": "Provides a reproduce command with --test-tags",
+          "passed": true,
+          "evidence": "--test-tags"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "passing-branch",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 45.8,
+        "tokens": 30925,
+        "tool_calls": 7,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "States the batch did NOT pass",
+          "passed": true,
+          "evidence": "did NOT pass"
+        },
+        {
+          "text": "Identifies Enterprise Tests as the failing slot",
+          "passed": true,
+          "evidence": "Enterprise Tests"
+        },
+        {
+          "text": "Names a failing test",
+          "passed": true,
+          "evidence": "test_custom_popup_snippet"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "passing-branch",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 78.3,
+        "tokens": 35421,
+        "tool_calls": 14,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "States the batch did NOT pass",
+          "passed": true,
+          "evidence": "did not pass"
+        },
+        {
+          "text": "Identifies Enterprise Tests as the failing slot",
+          "passed": true,
+          "evidence": "Enterprise Tests"
+        },
+        {
+          "text": "Names a failing test",
+          "passed": true,
+          "evidence": "test_custom_popup_snippet"
+        }
+      ],
+      "notes": []
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 48.333,
+        "stddev": 1.808,
+        "min": 45.8,
+        "max": 49.9
+      },
+      "tokens": {
+        "mean": 30145,
+        "stddev": 1337.996,
+        "min": 28262,
+        "max": 31248
+      },
+      "tool_calls": {
+        "mean": 7,
+        "stddev": 0.0,
+        "min": 7,
+        "max": 7
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 73.3,
+        "stddev": 3.829,
+        "min": 69.0,
+        "max": 78.3
+      },
+      "tokens": {
+        "mean": 33705.333,
+        "stddev": 1242.105,
+        "min": 32521,
+        "max": 35421
+      },
+      "tool_calls": {
+        "mean": 13,
+        "stddev": 0.816,
+        "min": 12,
+        "max": 14
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.00",
+      "time_seconds": "-25.0",
+      "tokens": "-3560",
+      "tool_calls": "-6.0"
+    }
+  },
+  "notes": [
+    "Correctness is identical (100% pass) with and without the skill: the baseline agent was dropped into the runbot-next repo itself, so it could reverse-engineer the CLI from source. The skill's value is therefore efficiency, not correctness.",
+    "With the skill, runs used a flat 7 tool calls vs 12-14 for baseline (~2x fewer) and finished ~25s faster (48s vs 73s) using ~3.5k fewer tokens \u2014 because the skill hands over the batches->build-names->tests workflow directly instead of making the agent explore src/cli.ts first.",
+    "Every assertion passes in both configs, so the assertions confirm correctness but don't discriminate skill value. In a realistic setting (CLI installed via npx, agent NOT sitting in the source repo) the gap would likely widen, since the baseline couldn't read the source to learn the commands."
+  ]
+}

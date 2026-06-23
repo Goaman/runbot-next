@@ -1,0 +1,16 @@
+{
+  "eval_id": 2,
+  "eval_name": "passing-branch-no-failures",
+  "prompt": "Did the last batch for branch master-mail-call-action-list-js-tref-nby pass? Summarize the test results.",
+  "assertions": [
+    {
+      "text": "States the batch did NOT pass"
+    },
+    {
+      "text": "Identifies Enterprise Tests as the failing slot"
+    },
+    {
+      "text": "Names a failing test"
+    }
+  ]
+}
